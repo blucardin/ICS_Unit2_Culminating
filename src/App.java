@@ -1,6 +1,6 @@
 /* This is the file that runs the snake game.
  * It displays the menu with an animation.
- * Based on user input it will then either start the snake game, go to the shop, print the rules, or go back the main menu.
+ * Based on user input it will then either start the snake game, go to the shop, print the rules, or quit the program.
  * 
  * Created by: Noah Virjee
  * Date: 2019-11-20
