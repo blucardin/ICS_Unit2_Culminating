@@ -34,17 +34,15 @@ class snake {
   static final char BACKGROUND = '.'; // set background character
 
   public static void updateFile() throws IOException { // update file method
-    // copy all the lines of the file to an array, remove the line that contains the
-    // username, and then add the new line to the array
 
     // write the new array to the file
-    writer = new PrintWriter(file);
-    for (String s : lines) {
-      writer.println(s);
+    writer = new PrintWriter(file); // create new printwriter that overwrites the file
+    for (String s : lines) { // for each line in the array
+      writer.println(s); // write the line to the file
     }
     writer.println(username + " " + coins + " " + colors[0] + " " + colors[1] + " " + colors[2] + " " + colors[3] + " "
-        + highScore);
-    writer.close();
+        + highScore); // write the new user to the file
+    writer.close(); // close the printwriter
 
   }
 
@@ -321,43 +319,39 @@ class snake {
   public static void main(String[] args) throws InterruptedException, IOException {
     System.out.print("\033[H\033[2J");
     System.out.flush();
-    System.out.println("Welcome to Snake!");
-    System.out.print("Enter your username to continue: ");
+    System.out.println("Welcome to Snake!"); // print the welcome message
+    System.out.print("Enter your username to continue: "); // ask the user for their username
     username = key.nextLine();
 
     // clear screen
     System.out.print("\033[H\033[2J");
     System.out.flush();
 
-    // If the username is in the file, get the user's coins, color preferences, and
-    // high scores
-    // If the username is not in the file, create a new user with 0 coins, default
-    // color preferences, and no high scores
     if (!file.exists()) {
-      file.createNewFile();
+      file.createNewFile(); // create the file if it does not exist
     }
-    Scanner fileReader = new Scanner(file);
-    boolean found = false;
+    Scanner fileReader = new Scanner(file); // create a scanner to read the file
+    boolean found = false; // create a boolean to check if the user's name is in the file
 
-    while (fileReader.hasNextLine()) {
-      String line = fileReader.nextLine();
+    while (fileReader.hasNextLine()) { // while there is another line in the file
+      String line = fileReader.nextLine(); // get the next line
 
-      if (!line.contains(username)) {
+      if (!line.contains(username)) { // if the line does not contain the user's name, add the line to the arraylist
         lines.add(line);
       }
 
-      String[] data = line.split(" ");
-      if (data[0].equals(username)) {
+      String[] data = line.split(" "); // split the line into an array of strings
+      if (data[0].equals(username)) { // if the first string in the array is the user's name
         found = true;
-        coins = Integer.parseInt(data[1]);
+        coins = Integer.parseInt(data[1]); // set the user's coins to the second string in the array
         colors[0] = data[2];
-        colors[1] = data[3];
+        colors[1] = data[3]; // set the colors to the second, third, fourth and fifth strings in the array
         colors[2] = data[4];
         colors[3] = data[5];
-        highScore = Integer.parseInt(data[6]);
-        System.out.println("Welcome back, " + username + "!");
+        highScore = Integer.parseInt(data[6]); // set the high score to the sixth string in the array
+        System.out.println("Welcome back, " + username + "!"); // welcome the user back
         System.out.println("You have " + coins + " coins.");
-        System.out.println("Your high score is " + highScore + ".");
+        System.out.println("Your high score is " + highScore + "."); // print the user's coins and high score
         System.out.println("Your color preferences have been loaded.");
         System.out.println("Enter any key to continue.");
         key.nextLine();
@@ -365,23 +359,25 @@ class snake {
       }
     }
     if (!found) {
-      System.out.println("Welcome, " + username + "!");
+      System.out.println("Welcome, " + username + "!"); // if the user's name is not in the file, welcome the user
       System.out.println("Your username was not found in the database.");
-      System.out.print("Would you like to create a new user? (y/n): ");
+      System.out.print("Would you like to create a new user? (y/n): "); // ask the user if they want to create a new
+                                                                        // user
       if (key.nextLine().equals("n")) {
-        main(null);
+        main(null); // if the user does not want to create a new user, restart the program
       }
-      writer = new PrintWriter(new FileWriter(file, true));
+      writer = new PrintWriter(new FileWriter(file, true)); // create a printwriter to write to the file
       writer.println(username + " 0 " + colors[0] + " " + colors[1] + " " + colors[2] + " " + colors[3] + " 0");
-      writer.close();
+      writer.close(); // write the user's name, coins, colors and high score to the file and close the
+                      // printwriter
 
       System.out.print("\033[H\033[2J");
       System.out.flush();
-      System.out.println("A new user has been created for you.");
+      System.out.println("A new user has been created for you."); // tell the user that a new user has been created
       System.out.println("Enter any key to continue.");
       key.nextLine();
     }
-    fileReader.close();
+    fileReader.close(); // close the file reader
 
     menu();
   }
@@ -394,7 +390,7 @@ class snake {
                                      // milliseconds
         System.out.print("\033[H\033[2J");
         System.out.flush();
-        System.out.println("Welcome, " + username + "!");
+        System.out.println("Welcome, " + username + "!"); // print the user's name
 
         char[][] board = new char[SIZE][SIZE * 2]; // create a new board
         for (int i = 0; i < SIZE; i++) {
@@ -406,14 +402,14 @@ class snake {
         board[15][15] = '0'; // fill the board with the target at the target's coordinates
 
         int[][] blocks = { { 7, 7 }, { 7, 8 }, { 7, 9 }, { 7, 10 }, { 7, 11 }, { 7, 12 }, { 7, 13 }, { 7, 14 },
-            { 7, 15 },
-            { 8, 15 }, { 9, 15 }, { 10, 15 }, { 11, 15 }, { 12, 15 }, { 13, 15 }, { 14, 15 }, { 15, 15 } };
+            { 7, 15 }, { 8, 15 }, { 9, 15 }, { 10, 15 }, { 11, 15 }, { 12, 15 }, { 13, 15 }, { 14, 15 }, { 15, 15 } };
 
-        for (int i = q; i < (q + 4); i++) { // for each block in the snake, fill the board with * at that coordinate.
+        for (int i = q; i < (q + 4); i++) { // For each block in the snake, 4 blocks at a time, fill the board with * at
+                                            // that coordinate.
           board[blocks[i][0]][blocks[i][1]] = '*';
         }
 
-        System.out.print(colors[1]); // Give the board the
+        System.out.print(colors[1]); // print the board's color
 
         for (int i = 0; i < SIZE; i++) {
           for (int j = 0; j < SIZE * 2; j++) { // iterate over each row and column of the board
