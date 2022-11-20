@@ -355,7 +355,6 @@ class snake {
         System.out.println("Your color preferences have been loaded.");
         System.out.println("Enter any key to continue.");
         key.nextLine();
-        break;
       }
     }
     if (!found) {
