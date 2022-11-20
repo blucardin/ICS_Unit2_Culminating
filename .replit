@@ -1,6 +1,6 @@
-compile = "javac -classpath .:target/dependency/* -d . $(find . -type f -name '*.java')"
-run = "java -classpath .:target/dependency/* Main"
-entrypoint = "Main.java"
+compile = "javac -classpath .:target/dependency/* $(find . -type f -name '*.java') -d /home/runner/ICS2Cul-Console-Snake/bin"
+run = "java -classpath /home/runner/ICS2Cul-Console-Snake/bin snake"
+entrypoint = "App.java"
 hidden = ["**/*.class"]
 
 [packager]
