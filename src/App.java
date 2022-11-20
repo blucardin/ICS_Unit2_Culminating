@@ -7,19 +7,40 @@ import java.util.ArrayList; // Import libraries
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
+import java.io.*;
 
 class snake {
 
   static Scanner key = new Scanner(System.in); //create new scanner
 
+  static File file = new File("users.txt"); //create new file
+  static PrintWriter writer ; //create new printwriter
+
   //create  array for colors
   static String[] colors = { color.RESET, color.RESET, color.RED, color.GREEN };
 
   static int coins = 0; //create coins variable
+  static String username = ""; //create username variable
+  static int highScore = 0; //create HighScore variable
+
+  static ArrayList<String> lines = new ArrayList<String>(); //create arraylist for lines
 
   // colors 0 represents menu color, 1 represents background color, 2 represents target color, 3 represents snake color
 
-  public static void shop() throws InterruptedException { //Method for shop
+  public static void updateFile() throws IOException { //update file method
+    // copy all the lines of the file to an array, remove the line that contains the username, and then add the new line to the array
+    
+    // write the new array to the file
+    writer = new PrintWriter(file);
+    for (String s : lines) {
+      writer.println(s);
+    }
+    writer.println(username + " " + coins + " " + colors[0] + " " + colors[1] + " " + colors[2] + " " + colors[3] + " " + highScore);
+    writer.close();
+
+  }
+
+  public static void shop() throws InterruptedException, IOException { //Method for shop
     while (true) {
       System.out.print("\033[H\033[2J"); //clear screen
       System.out.flush();
@@ -92,12 +113,14 @@ class snake {
             colors[object] = color.YELLOW;
             approved = true;
           }
+          break;
         default:
           System.out.println("Invalid choice, try again."); //if user chooses an invalid choice, print error message
           approved = false; //set approved to false
           break;
       }
       if (approved == true) {
+        updateFile(); //update file
         System.out.println(
           "Your purchase was approved! Your color is now equipped!"
         ); //if user has enough coins, print success message
@@ -111,7 +134,7 @@ class snake {
     }
   }
 
-  public static void game() throws InterruptedException {
+  public static void game() throws InterruptedException, IOException {
     boolean run = true;
     while (run) { //if the user wants to play again, this loop runs the game again
       final char BACKGROUND = '.'; //set background character
@@ -201,7 +224,7 @@ class snake {
           coords.add(y);
           coords.add(x);
 
-          if (blocks.contains(coords)) { // if the new blck is already in the snake, the snake has hit itself
+          if (blocks.contains(coords)) { // if the new block is already in the snake, the snake has hit itself
             reason = "You hit yourself."; // set the reason for death as, "You hit yourself."
             break;
           }
@@ -253,10 +276,20 @@ class snake {
       System.out.println(reason); //print the reason for death
       System.out.println();
       Thread.sleep(1000);
+      int score = blocks.size() - 2; //calculate the score
 
-      System.out.println("Your score was: " + blocks.size()); //print the score
+      // if the user got a new high score, print the new high score
+      if (score > highScore) {
+        System.out.println("New High Score: " + score);
+        highScore = score;
+        updateFile();
+      } else {
+        System.out.println("Your score was: " + score); //print the score
+        System.out.println("High Score: " + highScore);
+      }
       int coinsEarned = (blocks.size() - 2) * 10; //calculate the coins earned
       coins += coinsEarned; //add the coins to the user's total
+      updateFile(); //update the file with the new coins
       System.out.println("You earned " + coinsEarned + " coins!"); //print the coins earned
       System.out.println("You now have " + coins + " coins!"); //print the user's total coins
       System.out.println();
@@ -270,14 +303,80 @@ class snake {
     }
   }
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws InterruptedException, IOException {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
+    System.out.println("Welcome to Snake!");
+    System.out.print("Enter your username to continue: ");
+    username = key.nextLine();
+
+    //clear screen
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
+
+    // If the username is in the file, get the user's coins, color preferences, and high scores
+    // If the username is not in the file, create a new user with 0 coins, default color preferences, and no high scores
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    Scanner fileReader = new Scanner(file);
+    boolean found = false;
+
+    while (fileReader.hasNextLine()) {
+      String line = fileReader.nextLine();
+      
+      if (!line.contains(username)) {
+        lines.add(line);
+      }
+
+      String[] data = line.split(" ");
+      if (data[0].equals(username)) {
+        found = true;
+        coins = Integer.parseInt(data[1]);
+        colors[0] = data[2];
+        colors[1] = data[3];
+        colors[2] = data[4];
+        colors[3] = data[5];
+        highScore = Integer.parseInt(data[6]);
+        System.out.println("Welcome back, " + username + "!");
+        System.out.println("You have " + coins + " coins.");
+        System.out.println("Your high score is " + highScore + ".");
+        System.out.println("Your color preferences have been loaded.");
+        System.out.println("Enter any key to continue.");
+        key.nextLine();
+        break;
+      }
+    }
+    if (!found) {
+      System.out.println("Welcome, " + username + "!");
+      System.out.println("Your username was not found in the database.");
+      System.out.print("Would you like to create a new user? (y/n): ");
+      if (key.nextLine().equals("n")) {
+        main(null);
+      }
+      writer = new PrintWriter(new FileWriter(file, true));
+      writer.println(username + " 0 " + colors[0] + " " + colors[1] + " " + colors[2] + " " + colors[3] + " 0");
+      writer.close();
+
+      System.out.print("\033[H\033[2J");
+      System.out.flush();
+      System.out.println("A new user has been created for you.");
+      System.out.println("Enter any key to continue.");
+      key.nextLine();    
+    }
+    fileReader.close();
+
+    menu();
+  }
+
+  public static void menu() throws InterruptedException, IOException{
     boolean menu = true;
     while (menu) {
       //loop over array
       for (int i = 0; i < animation.length; i++) { //for each frame in the animation, flush the screen, print it, and wait for 125 milliseconds
         System.out.print("\033[H\033[2J");
         System.out.flush();
-        System.out.println("Welcome to Snake!");
+        System.out.println("Welcome, " + username + "!");
 
         System.out.println(
           "	........................................		" +
